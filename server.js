@@ -16,17 +16,26 @@ app.get('/notes', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'notes.html'));
 });
 
-// "Wildcard route" to act as a fallback
-app.get('*', (req, res) => {
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // API Routes
 app.get('/api/notes', (req, res) => {
-// Reads db.json to access the notes
-  fs.readFile('db.json', 'utf8', (err, data) => {
-    if (err) throw err;
-    res.json(JSON.parse(data));
+// Reads db.json file to access the notes
+  fs.readFile('db/db.json', 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Internal Server Error');
+      return;
+    }
+    try {
+      const notes = JSON.parse(data);
+      res.json(notes);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send('Error parsing JSON');
+    }
   });
 });
 
@@ -39,30 +48,54 @@ app.post('/api/notes', (req, res) => {
     text: req.body.text,
   };
 // Reads db.json for existing notes
-  fs.readFile('db.json', 'utf8', (err, data) => {
-    if (err) throw err; // Error handling
-    const notes = JSON.parse(data); // Parses existing notes
-    notes.push(newNote); // Includes the newly-created note in the array
-    // Writes the updates notes array back to the db.json file
-    fs.writeFile('db.json', JSON.stringify(notes, null, 2), (err) => {
-      if (err) throw err;
-      res.json(newNote);
-    });
+fs.readFile('db/db.json', 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    try {
+      const notes = JSON.parse(data);
+      notes.push(newNote);
+
+      fs.writeFile('db/db.json', JSON.stringify(notes, null, 2), (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ error: 'Error writing to DB' });
+        }
+        res.json(newNote);
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error parsing JSON' });
+    }
   });
 });
 
 // Handling note deletion
 app.delete('/api/notes/:id', (req, res) => {
 // Reads db.json for existing notes
-  fs.readFile('db.json', 'utf8', (err, data) => {
-    if (err) throw err; // Error handling
-    let notes = JSON.parse(data); // Parses existing notes
-    notes = notes.filter((note) => note.id !== req.params.id); // Deletes the selected note from the array
-    // Writes the updates notes array back to the db.json file
-    fs.writeFile('db.json', JSON.stringify(notes, null, 2), (err) => {
-      if (err) throw err;
-      res.sendStatus(204);
-    });
+fs.readFile('db/db.json', 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Internal Server Error' });
+    }
+
+    try {
+      let notes = JSON.parse(data);
+      notes = notes.filter((note) => note.id !== req.params.id);
+
+      fs.writeFile('db/db.json', JSON.stringify(notes, null, 2), (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ error: 'Error writing to DB' });
+        }
+        res.sendStatus(204);
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Error parsing JSON' });
+    }
   });
 });
 
