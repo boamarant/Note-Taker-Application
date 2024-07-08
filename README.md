@@ -10,7 +10,7 @@ N/A
 
 ## Usage
 
-This project can be accessed on Git Pages at the following URL: [https://boamarant.github.io/Module-3-Challenge/](https://boamarant.github.io/Module-3-Challenge/).
+This project is being deployed on Render at the following URL: [https://note-taker-application-6lpo.onrender.com/](https://note-taker-application-6lpo.onrender.com/). 
 
 ## Credits
 
@@ -18,7 +18,7 @@ I referenced previous projects and examples from the Columbia University Coding 
 
 ## Features
 
-The application allows users to enter notes and a description of a note. When the note has both a title and description, the user is allowed to add it to their list of notes. Users can revisit notes they have already created, as well as delete them as they see fit. 
+The application allows users to enter notes and a description of a note. When the note has both a title and description, the user is allowed to add it to their list of notes. Users can revisit notes they have already created, as well as delete them as they see fit. Notes will be saved for each user on a page refresh.
 
 ## Screenshot of Deployed Application
 
